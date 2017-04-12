@@ -2647,18 +2647,17 @@ int drmOpenOnceWithType(const char *BusID, int *newlyopened, int type)
     int fd;
 
     for (i = 0; i < nr_fds; i++)
-        if ((strcmp(BusID, connection[i].BusID) == 0) &&
-            (connection[i].type == type)) {
+        if ((connection[i].type == type)) {
             connection[i].refcount++;
             *newlyopened = 0;
             return connection[i].fd;
         }
 
-    fd = drmOpenWithType(NULL, BusID, type);
+    fd = open("/dev/dri/card1", O_RDWR | O_CLOEXEC);
     if (fd < 0 || nr_fds == DRM_MAX_FDS)
         return fd;
 
-    connection[nr_fds].BusID = strdup(BusID);
+    //connection[nr_fds].BusID = strdup(BusID);
     connection[nr_fds].fd = fd;
     connection[nr_fds].refcount = 1;
     connection[nr_fds].type = type;
