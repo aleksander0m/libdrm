@@ -135,6 +135,25 @@ struct etna_bo *etna_bo_new(struct etna_device *dev, uint32_t size,
 	return bo;
 }
 
+struct etna_bo *
+etna_bo_from_handle(struct etna_device *dev, uint32_t handle, uint32_t size)
+{
+	struct etna_bo *bo;
+
+	pthread_mutex_lock(&table_lock);
+
+	bo = lookup_bo(dev->handle_table, handle);
+	if (bo)
+		goto out_unlock;
+
+	bo = bo_from_handle(dev, size, handle, 0);
+
+out_unlock:
+	pthread_mutex_unlock(&table_lock);
+
+	return bo;
+}
+
 struct etna_bo *etna_bo_ref(struct etna_bo *bo)
 {
 	atomic_inc(&bo->refcnt);
